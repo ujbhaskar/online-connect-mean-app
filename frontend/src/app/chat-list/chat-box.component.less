@@ -1,0 +1,58 @@
+.chatbox{
+	border: 1px solid grey;
+	.chatbox-header{
+		background-color: black;
+		color: white;
+		padding: 10px;
+		.close{
+			color: white;
+			text-shadow: 0 0 0 #000;
+			opacity:1
+		}
+	}
+	.chatbox-body{
+		min-height:300px;
+		max-height:300px;
+		overflow-y:auto;
+		.chat-text{
+			word-wrap: break-word;
+		}
+		background-color:#eceff1;
+	}
+	.chatbox-footer{
+		.form-group{
+			margin:1px 0 0;
+			padding:0;
+		}
+		.col-*,.form-group{
+			padding:0;
+		}
+		background:black;
+		textarea{
+			max-height:70px;
+		}
+		textarea,button{
+			width:100%;
+		}
+	}
+	.youTag,.meTag{
+		&:after{
+			clear:both;
+		}
+		padding:10px;
+		margin: 2px 20px;
+		border-radius:5px;
+		//width:~'calc(80% - 20px)';
+	}
+	.youTag{
+		background-color:white;
+		float:left;
+	}
+	.meTag{
+		background-color:#cfd8dc;
+		float:right;
+		&>span{
+			float:right;
+		}
+	}
+}
