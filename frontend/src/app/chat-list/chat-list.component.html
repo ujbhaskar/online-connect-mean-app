@@ -1,0 +1,15 @@
+<div class="row">
+	<div class="col-md-2 border-rt">
+		<p>Users List</p>
+		<div class="pointer"  *ngFor="let user of users" (click)="selectUser(user)">
+			<span *ngIf="user.isOnline" class="glyphicon glyphicon-eye-open"></span>
+			<span *ngIf="!user.isOnline" class="glyphicon glyphicon-eye-close"></span>
+			<span>{{user.firstName}}</span>
+			<span>{{user.lastName}}</span>
+			<!-- <span>{{localUser.email}}</span> -->
+		</div>	
+	</div>
+	<div class="col-md-8 col-md-offset-1">
+		<app-chat-box [user]="userToChat" *ngIf="userToChat"></app-chat-box>
+	</div>
+</div>

@@ -1,0 +1,145 @@
+#!/usr/bin/env node
+
+/**
+ * Module dependencies.
+ */
+
+var app = require('../app');
+var debug = require('debug')('kdcd:server');
+var http = require('http');
+
+/**
+ * Get port from environment and store in Express.
+ */
+
+var port = normalizePort(process.env.PORT || '3000');
+app.set('port', port);
+
+/**
+ * Create HTTP server.
+ */
+
+var server = http.createServer(app);
+
+var io = require('socket.io')(server);
+/**
+ * Listen on provided port, on all network interfaces.
+ */
+
+var index = require('../routes/index');
+var user = require('../routes/user')(io);
+var message = require('../routes/message')(io);
+
+app.use('/', index);
+app.use('/user', user);
+app.use('/message', message);
+
+// catch 404 and forward to error handler
+app.use(function(req, res, next) {
+  var err = new Error('Not Found');
+  err.status = 404;
+  next(err);
+});
+
+// error handler
+app.use(function(err, req, res, next) {
+  // set locals, only providing error in development
+  res.locals.message = err.message;
+  res.locals.error = req.app.get('env') === 'development' ? err : {};
+
+  // render the error page
+  res.status(err.status || 500);
+  res.render('error');
+});
+
+server.listen(port);
+server.on('error', onError);
+server.on('listening', onListening);
+
+io.on('user_logged', function(){
+    console.log('in user logged io event');
+});
+io.on('connection', function (socket) {
+  console.log('a user got connected');
+  
+  socket.on('user_logged', function(){
+      console.log('in user logged');
+  });
+  // socket.on('user_logged',function(msg){
+  //   console.log('====================in user_logged =========================================');
+  //   //socket.broadcast.emit('refresh_user_list',msg);
+  //   io.sockets.emit('refresh_user_list',msg);
+  // });
+    // setTimeout(() => {
+    //   console.log('in setTimeout');
+    //   io.emit('chat message', 'hello friendy trendy!!');
+    //   }, 5000);
+    // setInterval(function(){
+    //   console.log('in setTimeout');
+    //   io.emit('chat message', 'hello friendy trendy!!');
+    // },2000);
+  socket.on('chat message', function(msg){
+    console.log('message: ' + msg);
+    io.emit('chat message', msg);
+  });
+});
+   
+/**
+ * Normalize a port into a number, string, or false.
+ */
+
+function normalizePort(val) {
+  var port = parseInt(val, 10);
+
+  if (isNaN(port)) {
+    // named pipe
+    return val;
+  }
+
+  if (port >= 0) {
+    // port number
+    return port;
+  }
+
+  return false;
+}
+
+/**
+ * Event listener for HTTP server "error" event.
+ */
+
+function onError(error) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+
+  var bind = typeof port === 'string'
+    ? 'Pipe ' + port
+    : 'Port ' + port;
+
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
+
+/**
+ * Event listener for HTTP server "listening" event.
+ */
+
+function onListening() {
+  var addr = server.address();
+  var bind = typeof addr === 'string'
+    ? 'pipe ' + addr
+    : 'port ' + addr.port;
+  debug('Listening on ' + bind);
+}

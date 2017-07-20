@@ -1,0 +1,21 @@
+<header>
+	<div class="row">
+		<div class="col-md-6">
+			<h1 class="company"><a [routerLink]="['/']">Online Chat Application</a></h1>
+		</div>
+		<div class="col-md-6 mar-top-20px">
+			<div class="floatR">
+				<span *ngIf="!isLoggedIn()">
+					<a [routerLink]="['sign-in']">Sign in</a>
+					<span class="glyphicon glyphicon-option-vertical"></span>
+					<a [routerLink]="['sign-up']">Sign up</a>
+				</span>
+				<span *ngIf="isLoggedIn()">
+					<span>Welcome {{username}}</span>
+					<span class="glyphicon glyphicon-option-vertical"></span>
+					<a (click)="onLogout()"><span class="glyphicon glyphicon-off"></span> Logout</a>
+				</span>
+			</div>
+		</div>
+	</div>
+</header>
