@@ -7,30 +7,46 @@ var mongoose = require('mongoose');
 var User = require('../models/user');
 
 module.exports = function(io){
+    var counter = 0;
+    var usersAvailable = [];
     var onlineUsers = [];
     var token = '';
     io.on('connection', function (socket) {
-
+        socket.on('attendence',function(email){
+            if(usersAvailable.indexOf(email)===-1){
+                usersAvailable.push(email);
+            }
+        })
       socket.on('userActive',function(user){
         if(onlineUsers.indexOf(user.email)==-1){
             onlineUsers.push(user.email);
         }
       });
       socket.on('disconnect', function(){
-        console.log('user disconnected ');
-        console.log(onlineUsers);
-        // jwt.verify(token, 'secret', function (err, decoded) {
-        //     User.findOne({email: decoded.user.email}, function(err, user) {
-        //         user.isOnline = false;
-        //         user.save(function (err, result) {
-        //             if (err) {
-        //                 console.log('in error while saving');
-        //             }
-        //             console.log('-------------browser closed out----------------------');
-        //             setTimeout(function(){io.sockets.emit('logout')},100);
-        //         });
-        //     })
-        // });
+        setTimeout(function(){
+            usersAvailable = [];
+            User.find({})
+                .exec(function (err, users) {
+                    for(var i = 0; i<users.length;i++){
+                        io.emit('ping'+users[i].email, users[i].email);
+                    }
+                    setTimeout(function(){
+                        for(var i = 0; i<users.length;i++){
+                            if(usersAvailable.indexOf(users[i].email)===-1 && users[i].isOnline){
+                                (function(index,user){                                        
+                                    user.isOnline = false;
+                                    user.save(function (err, result) {
+                                        if (err) {
+                                            console.log('in error while saving');
+                                        }
+                                        setTimeout(function(){io.sockets.emit('logout')},100);   
+                                    });
+                                })(i,users[i]);
+                            }
+                        }
+                    },2000);
+                });
+        },5000);
       });
     });
     router.post('/', function (req, res, next) {
@@ -100,6 +116,7 @@ module.exports = function(io){
                     error: err
                 });
             }
+            var flag = user.isOnline;
             user.isOnline = true;
             user.save(function (err, result) {
                 if (err) {
@@ -108,7 +125,8 @@ module.exports = function(io){
                         error: err
                     });
                 }
-                setTimeout(function(){io.sockets.emit('loggedUser')},1000);
+                if(!flag)
+                    setTimeout(function(){io.sockets.emit('loggedUser')},1000);
                 res.status(200).json({
                     message: 'Success',
                     obj: {
