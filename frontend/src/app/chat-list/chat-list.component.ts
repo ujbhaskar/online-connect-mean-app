@@ -15,21 +15,37 @@ export class ChatListComponent implements OnInit {
   userToChat:ChatUser;
 	//Array<{firstName: string, lastName: string, email: string}>;
   	constructor(private zone:NgZone, private authService: AuthService) { 
+      console.log('in chat list constructor');
       var self = this;
       socket.on('payload', function(){
-        //console.log('in chat-list payload socket');
         // self.getUsers();
       });
       socket.on('saveUser', function(){
-        //console.log('in chat-list saveUser socket');
       });
       socket.on('getUserList', function(){
-        //console.log('in chat-list getUserList socket');
       });
       socket.on('loggedUser', function(){
         // self.getUsers();
-        //console.log('in chat-list loggedUser socket');
       });
+    }
+
+  	ngOnInit() {
+      var self = this;
+      console.log('in chat list init');
+      this.authService.fetchedUser.subscribe(
+        (user: ChatUser) => {
+          this.localUser = user;
+          socket.on('ping'+user.email,function(email:string){
+            console.log('got pingged here : ' , email);
+            socket.emit('attendence' , email);
+          })
+        }
+        );
+
+      this.getUsers();
+      this.localUser = this.authService.loggedUser;
+      console.log('in ngOnInit of chatlist where localUser is : ' , this.localUser);
+      
       socket.on('signin', function(){
         if(self.authService.isLoggedIn())
           self.getUsers();
@@ -38,12 +54,10 @@ export class ChatListComponent implements OnInit {
         if(self.authService.isLoggedIn())
           self.getUsers();
       });
-    }
-
-  	ngOnInit() {
-      this.getUsers();
-      this.localUser = this.authService.loggedUser;
-      console.log('in ngOnInit of chatlist where localUser is : ' , this.localUser);
+      socket.on('loggedUser', function(){
+        if(self.authService.isLoggedIn())
+          self.getUsers();
+      });
   	}
     getUsers(){
       var self = this;

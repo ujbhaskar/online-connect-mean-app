@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit,EventEmitter } from '@angular/core';
 import { Router } from "@angular/router";
 import { AuthService } from "./auth/auth.service";
 import {ChatUser} from "./auth/chat-user.model";
@@ -9,17 +9,20 @@ import {ChatUser} from "./auth/chat-user.model";
   styleUrls: ['./app.component.less']
 })
 export class AppComponent  implements OnInit {
+  // fetUser = new EventEmitter<ChatUser>();
 	constructor(private authService: AuthService, private router: Router) {}
   	ngOnInit() {
-      console.log('in HeaderComponent');
 	  	if(localStorage.getItem('token')){
 	  		this.getUserDetails(localStorage.getItem('token'));
 	  	}
-  		this.authService.fetUser.subscribe(
-            (token: string) => {
-            	this.getUserDetails(token);
-            }
-        );
+      else{
+        this.router.navigate(['/sign-in']);
+      }
+  		// this.authService.fetUser.subscribe(
+    //         (token: string) => {
+    //         	this.getUserDetails(token);
+    //         }
+    //     );
   		
   	}
   	user:ChatUser;
@@ -27,7 +30,7 @@ export class AppComponent  implements OnInit {
   		this.authService.getUser(token)
   		.subscribe(
           (data) => {
-          	  console.log('over here');
+              this.authService.fetchedUser.emit(data.obj);
               this.authService.loggedUser = data.obj;
               this.user = data.obj;
               this.router.navigate(['/chat-list']);

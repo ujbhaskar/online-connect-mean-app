@@ -11,12 +11,10 @@ import { User } from "./user.model";
 
 @Injectable()
 export class AuthService  implements OnInit {
-
+    fetchedUser = new EventEmitter<ChatUser>();
     ngOnInit(){
-        console.log('in ngonit of auth servise')
     }
     constructor(private http: Http, private router: Router,private errorsService: ErrorService,private configuration: Configurations) {}
-    fetUser = new EventEmitter<string>();
 
     // editMessage(userId: string) {
     //     this.gotUserId.emit(userId);
@@ -49,7 +47,6 @@ export class AuthService  implements OnInit {
         return this.http.get('http://'+this.configuration.getIpAddress()+':3000/user?token='+localStorage.getItem('token'), {headers: headers})
             .map((response: Response) => response.json())
             .catch((error: Response) => {
-                // console.log('over here : ' , error);
                 // this.errorsService.handleError(error.json());
                 this.clearToken();
                 this.router.navigateByUrl('/sign-in');
@@ -82,7 +79,6 @@ export class AuthService  implements OnInit {
     }
 
     isLoggedIn() {
-        // console.log('in isLogged in where token is : ' , localStorage.getItem('token'));
         return localStorage.getItem('token') !== null;
     }
 }

@@ -24,18 +24,15 @@ export class ChatBoxComponent implements OnInit {
   	constructor(private zone:NgZone,private authService: AuthService,private messageService: MessageService) {
   		var self = this;
 		socket.on('messageSaved', function(){
-			console.log('in messageSaved ');
 			self.getMessages();
 		});
 
   	}
 	ngOnChanges(changes) {
-		console.log(changes);
 		this.getMessages();
 	}
   	ngOnInit() {
   		this.localUser = this.authService.loggedUser;
-  		console.log(this.localUser);
       	this.messageForm = new FormGroup({
             message: new FormControl(null,Validators.required)
         });
@@ -45,7 +42,6 @@ export class ChatBoxComponent implements OnInit {
 		this.user = undefined;
 	}
 	onSubmit(){
-		console.log(this.messageForm.value.message);
 		this.curMessage = {
 			message: this.messageForm.value.message,
 			sender:this.authService.loggedUser.email,
@@ -55,7 +51,6 @@ export class ChatBoxComponent implements OnInit {
 		}
 		this.messageService.saveMessage(this.curMessage).subscribe(
           (data) => {
-          	console.log('saved message is : ', data);
 			this.messageForm.reset();
 
           }
@@ -64,13 +59,11 @@ export class ChatBoxComponent implements OnInit {
 
 	getMessages(){
 		var self = this;
-		console.log('in chatbox component where user is : ', this.user);
 		if(!this.user)
 			return;
 		this.messageService.getMessages(this.user.email).subscribe(
 			(data)=>{
 				self.zone.run(function(){
-					console.log('all messages is: ' , data);
 					self.messages = data.obj;
 					setTimeout(function(){
 						$("div.chatbox-body").scrollTop($('div.chatbox-body').prop('scrollHeight'));

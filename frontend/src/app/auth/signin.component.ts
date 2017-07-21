@@ -15,13 +15,12 @@ export class SigninComponent {
     constructor(private authService: AuthService, private router: Router) {}
 
     onSubmit() {
-        console.log(this.myForm);
         const user = new User(this.myForm.value.email, this.myForm.value.password);
         this.authService.signin(user)
             .subscribe(
                 data => {
                     localStorage.setItem('token', data.token);
-                    this.authService.fetUser.emit(data.token);
+                    // this.authService.fetUser.emit(data.token);
                     this.router.navigateByUrl('/chat-list');
                 },
                 error => console.error(error)
