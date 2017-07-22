@@ -18,6 +18,11 @@ export class AppComponent  implements OnInit {
       else{
         this.router.navigate(['/sign-in']);
       }
+      this.authService.fetchedUser.subscribe(
+        (user: ChatUser) => {
+          this.user = user;
+        }
+        );
   		// this.authService.fetUser.subscribe(
     //         (token: string) => {
     //         	this.getUserDetails(token);

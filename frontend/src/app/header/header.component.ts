@@ -38,6 +38,11 @@ export class HeaderComponent implements OnInit {
    username:string;
 
   	ngOnInit() {
+      this.authService.fetchedUser.subscribe(
+        (user: ChatUser) => {
+          this.user = user;
+        }
+        );
   	}
 	onLogout() {
 	    this.authService.logout()

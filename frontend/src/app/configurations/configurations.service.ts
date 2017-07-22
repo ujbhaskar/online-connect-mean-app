@@ -1,6 +1,6 @@
 export class Configurations {
     constructor() {}
     getIpAddress(){
-    	return '10.141.27.25';
+    	return '180.215.84.62';
     }
 }

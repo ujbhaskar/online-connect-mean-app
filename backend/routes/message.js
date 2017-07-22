@@ -32,7 +32,13 @@ module.exports = function(io){
 			                    error: err
 			                });
 			            }
-			            setTimeout(function(){io.sockets.emit('messageSaved')},100);
+			            setTimeout(function(){
+			            	console.log('-------------------------------------');
+			            	console.log(req.body.receiver);
+			            	console.log('+++++++++++++++++++++++++++++++++++++');
+			            	io.sockets.emit('messageSaved'+req.body.sender+'->'+req.body.receiver[0]);
+			            	io.sockets.emit('hello:'+req.body.receiver[0],req.body.sender);
+			            },100);
 			            res.status(201).json({
 			                message: 'Message saved',
 			                obj: result
@@ -51,7 +57,7 @@ module.exports = function(io){
 
 	router.get('/',function(req,res,next){
 		var token = req.query.token;
-		console.log('req.query.email : ' , req.query.email);
+		// console.log('req.query.email : ' , req.query.email);
 		if(token){
 			jwt.verify(req.query.token, 'secret', function (err, decoded) {
 				if(err){					           		
@@ -68,7 +74,7 @@ module.exports = function(io){
 	                    });
 					}
 					var messages1 = messages1;
-					console.log('messages1 : ' , messages1);
+					// console.log('messages1 : ' , messages1);
 					Message.find({
 						sender: req.query.email,
 						receiver:{ $in : [decoded.user.email]}
@@ -80,7 +86,7 @@ module.exports = function(io){
 		                    });
 						}
 						var messages2 = messages2;
-					console.log('messages2 : ' , messages2);
+					// console.log('messages2 : ' , messages2);
 						var messages = messages1.concat(messages2);
 						messages.sort(function(a, b) {
 						    return a.date.getTime() - b.date.getTime();

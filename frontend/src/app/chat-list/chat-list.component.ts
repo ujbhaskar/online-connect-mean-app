@@ -38,7 +38,24 @@ export class ChatListComponent implements OnInit {
           socket.on('ping'+user.email,function(email:string){
             console.log('got pingged here : ' , email);
             socket.emit('attendence' , email);
-          })
+          });
+          socket.on('hello:'+this.localUser.email, function(email){
+            if(!self.userToChat || (email !== self.userToChat.email)){
+            console.log('hre :: ' , email);
+            console.log('and :: ' , self.userToChat);
+              for(var i = 0;i<self.users.length;i++){
+                console.log(self.users[i].email + '<==>' + email);
+                console.log(self.users[i].email === email);
+                if(self.users[i].email===email){
+                  self.zone.run(function(){
+                    self.users[i].ping++;
+                  });
+                  console.log('inside: ' + self.users[i].ping);
+                  break;
+                }
+              }
+            }
+          });
         }
         );
 
@@ -66,13 +83,18 @@ export class ChatListComponent implements OnInit {
           (data) => {
             self.zone.run(function(){
               self.users = data.obj;
+              for(var i = 0;i<self.users.length;i++){
+                self.users[i].ping = 0;
+              }
             });
           }
         );
     }
     selectUser(user:ChatUser){
+      user.ping=0;
       this.userToChat = undefined;
       this.userToChat = user;
+      console.log('this.userToChat : ' , this.userToChat);
     }
 
 }
