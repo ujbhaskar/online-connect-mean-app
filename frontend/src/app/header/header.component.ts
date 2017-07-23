@@ -13,40 +13,23 @@ export class HeaderComponent implements OnInit {
   @Input() user:ChatUser;
 
   ngOnChanges(changes) {
-        if(changes.user.currentValue){
-          this.username = this.user.firstName+' '+this.user.lastName; 
-        }
-    }
-  constructor(private authService: AuthService, private router: Router) {
-    socket.on('payload', function(){
-    });
-    socket.on('saveUser', function(){
-    });
-    socket.on('getUserList', function(){
-    });
-    socket.on('loggedUser', function(){
-    });
-    socket.on('signin', function(){
-    });
-    socket.on('logout', function(){
-    });
+      if(changes.user.currentValue){
+        this.username = this.user.firstName+' '+this.user.lastName; 
+      }
   }
-
-    isLoggedIn() {
-        return this.authService.isLoggedIn();
-    }
-   username:string;
-
-  	ngOnInit() {
-  	}
+  constructor(private authService: AuthService, private router: Router) {}
+  isLoggedIn() {
+      return this.authService.isLoggedIn();
+  }
+  username:string;
+  ngOnInit() {}
 	onLogout() {
-	    this.authService.logout()
-      .subscribe(
-        (data)=>{
-          localStorage.clear();
-          this.router.navigate(['/sign-in']);
-        }
-        );
+    this.authService.logout()
+    .subscribe(
+      (data)=>{
+        localStorage.clear();
+        this.router.navigate(['/sign-in']);
+      }
+    );
 	}
-
 }

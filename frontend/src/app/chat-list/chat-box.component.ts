@@ -22,24 +22,30 @@ export class ChatBoxComponent implements OnInit {
 	messages:Message[];
 	curMessage:Message;
   	constructor(private zone:NgZone,private authService: AuthService,private messageService: MessageService) {
-  		var self = this;
-		socket.on('messageSaved', function(){
-			self.getMessages();
-		});
+  		
 
   	}
 	ngOnChanges(changes) {
 		this.getMessages();
 	}
   	ngOnInit() {
+  		console.log('in ngOnInit :: ' , this.authService.loggedUser);
   		this.localUser = this.authService.loggedUser;
       	this.messageForm = new FormGroup({
             message: new FormControl(null,Validators.required)
         });
         this.getMessages();
+        var self = this;
+        socket.on('messageSaved'+this.me.email+'->'+this.user.email, function(){
+			self.getMessages();
+		});
+		socket.on('messageSaved'+this.user.email+'->'+this.me.email, function(){
+			self.getMessages();
+		});
   	}
 	closeChat(){
-		this.user = undefined;
+		// this.user = undefined;
+		this.authService.closedUser.emit(this.user);
 	}
 	onSubmit(){
 		this.curMessage = {
@@ -52,7 +58,7 @@ export class ChatBoxComponent implements OnInit {
 		this.messageService.saveMessage(this.curMessage).subscribe(
           (data) => {
 			this.messageForm.reset();
-
+			this.getMessages();
           }
 		);
 	}
