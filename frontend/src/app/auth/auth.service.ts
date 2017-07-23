@@ -12,6 +12,7 @@ import { User } from "./user.model";
 @Injectable()
 export class AuthService  implements OnInit {
     fetchedUser = new EventEmitter<ChatUser>();
+    closedUser = new EventEmitter<ChatUser>();
     ngOnInit(){
     }
     constructor(private http: Http, private router: Router,private errorsService: ErrorService,private configuration: Configurations) {}

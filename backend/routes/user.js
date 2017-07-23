@@ -17,37 +17,60 @@ module.exports = function(io){
                 usersAvailable.push(email);
             }
         })
-      socket.on('userActive',function(user){
-        if(onlineUsers.indexOf(user.email)==-1){
-            onlineUsers.push(user.email);
-        }
-      });
-      socket.on('disconnect', function(){
-        setTimeout(function(){
-            usersAvailable = [];
-            User.find({})
-                .exec(function (err, users) {
-                    for(var i = 0; i<users.length;i++){
-                        io.emit('ping'+users[i].email, users[i].email);
+        socket.on('inactive',function(us){
+            User.findOne({email:us.email}).exec(function(err,user){
+                if(err){
+                    console.log(err);
+                }
+                user.isOnline = 'away';
+                user.save(function(err,result){
+                    if(err){
+                        console.log(err);
                     }
-                    setTimeout(function(){
+                    setTimeout(function(){io.sockets.emit('awayUser')},100);   
+                })
+            });
+        });
+        socket.on('userActive',function(us){
+            User.findOne({email:us.email}).exec(function(err,user){
+                if(err){
+                    console.log(err);
+                }
+                user.isOnline = 'yes';
+                user.save(function(err,result){
+                    if(err){
+                        console.log(err);
+                    }
+                    setTimeout(function(){io.sockets.emit('loggedUser')},100);   
+                })
+            });
+        });
+        socket.on('disconnect', function(){
+            setTimeout(function(){
+                usersAvailable = [];
+                User.find({})
+                    .exec(function (err, users) {
                         for(var i = 0; i<users.length;i++){
-                            if(usersAvailable.indexOf(users[i].email)===-1 && users[i].isOnline){
-                                (function(index,user){                                        
-                                    user.isOnline = false;
-                                    user.save(function (err, result) {
-                                        if (err) {
-                                            console.log('in error while saving');
-                                        }
-                                        setTimeout(function(){io.sockets.emit('logout')},100);   
-                                    });
-                                })(i,users[i]);
-                            }
+                            io.emit('ping'+users[i].email, users[i].email);
                         }
-                    },2000);
-                });
-        },5000);
-      });
+                        setTimeout(function(){
+                            for(var i = 0; i<users.length;i++){
+                                if(usersAvailable.indexOf(users[i].email)===-1 && users[i].isOnline != 'no'){
+                                    (function(index,user){
+                                        user.isOnline = 'no';
+                                        user.save(function (err, result) {
+                                            if (err) {
+                                                console.log('in error while saving');
+                                            }
+                                            setTimeout(function(){io.sockets.emit('logout')},100);   
+                                        });
+                                    })(i,users[i]);
+                                }
+                            }
+                        },2000);
+                    });
+            },5000);
+        });
     });
     router.post('/', function (req, res, next) {
         setTimeout(function(){io.sockets.emit('saveUser')},1000);
@@ -74,7 +97,26 @@ module.exports = function(io){
             });
         });
     });
+    router.get('/updateAll',function(req,res,next){
+        User.find({})
+        .exec(function(err,users){
+            if (err) {
+                    return res.status(500).json({
+                        title: 'An error occurred',
+                        error: err
+                    });
+                }
+                for(var i = 0;i<users.length;i++){
+                    users[i].isOnline = 'no';
+                    users[i].save(function (err, result) {});
+                }
+            res.status(200).json({
+                    message: 'Success',
+                    obj: users
+                });
+        });
 
+    });
     router.get('/', function (req, res, next) {
 
      //console.log(' in get call req : ' , req.headers['token']);
@@ -117,7 +159,7 @@ module.exports = function(io){
                 });
             }
             var flag = user.isOnline;
-            user.isOnline = true;
+            user.isOnline = 'yes';
             user.save(function (err, result) {
                 if (err) {
                     return res.status(500).json({
@@ -125,7 +167,7 @@ module.exports = function(io){
                         error: err
                     });
                 }
-                if(!flag)
+                if(flag !== 'yes')
                     setTimeout(function(){io.sockets.emit('loggedUser')},1000);
                 res.status(200).json({
                     message: 'Success',
@@ -160,7 +202,7 @@ module.exports = function(io){
                     error: {message: 'Invalid login credentials'}
                 });
             }
-            user.isOnline = true;
+            user.isOnline = 'yes';
             user.save(function (err, result) {
                 if (err) {
                     return res.status(500).json({
@@ -196,7 +238,7 @@ module.exports = function(io){
                         error: err
                     });
                 }
-                user.isOnline = false;
+                user.isOnline = 'no';
                 user.save(function (err, result) {
                     if (err) {
                         return res.status(500).json({
