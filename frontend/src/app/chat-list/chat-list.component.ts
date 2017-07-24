@@ -3,6 +3,7 @@ import { AuthService } from "../auth/auth.service";
 import {ChatUser} from "../auth/chat-user.model";
 import $ from 'jquery/dist/jquery';
 import {socket} from "../auth/provideSocket";
+import {MessageService} from "./chat-list.service";
 
 @Component({
   selector: 'app-chat-list',
@@ -16,7 +17,7 @@ export class ChatListComponent implements OnInit {
   isActive:Boolean = true;
   blinkTitle:any;
 	//Array<{firstName: string, lastName: string, email: string}>;
-  	constructor(private zone:NgZone, private authService: AuthService) { 
+  	constructor(private zone:NgZone, private authService: AuthService,private messageService: MessageService) {
       var self = this;
       socket.on('payload', function(){
         // self.getUsers();
@@ -33,9 +34,12 @@ export class ChatListComponent implements OnInit {
   	ngOnInit() {
       var self = this;
       window.onfocus = function () {
+        console.log('in onfocus');
         socket.emit('userActive',self.localUser);
         self.isActive = true; 
         clearInterval(self.blinkTitle);
+        self.blinkTitle = undefined;
+        console.log('now self.blinkTitle : ' , self.blinkTitle);
         $(document).prop('title','Online Chat');
       }; 
       window.onblur = function () { 
@@ -62,12 +66,18 @@ export class ChatListComponent implements OnInit {
           socket.on('ping'+user.email,function(email:string){
             socket.emit('attendence' , email);
           });
+
+        socket.on('readMessage'+this.localUser.email, function(){
+          if(self.authService.isLoggedIn())
+            self.getUnseenCounts();
+        });
+
           socket.on('hello:'+this.localUser.email, function(email){
             if(!self.userToChat || (email !== self.userToChat.email)){
               for(var i = 0;i<self.users.length;i++){
                 if(self.users[i].email===email){
                   self.zone.run(function(){
-                    self.users[i].ping++;
+                    self.getUnseenCounts();
                     $('#chatAudio')[0].play();
                   });
                   break;
@@ -75,13 +85,13 @@ export class ChatListComponent implements OnInit {
               }
             }
             if(!self.isActive){ 
-
               for(var i = 0;i<self.users.length;i++){
                 if(self.users[i].email===email){                                   
                   self.blinkTitle = setInterval(function(){
                       var title = document.title;
                       document.title = (title == self.users[i].firstName + ' messaged you' ? "Online Chat" : self.users[i].firstName + ' messaged you');
                   }, 1000);
+                  self.getUnseenCounts();
                   $('#chatAudio')[0].play();
                   break;
                 }
@@ -112,6 +122,22 @@ export class ChatListComponent implements OnInit {
       });
 
   	}
+    getUnseenCounts(){
+      var self = this;
+      if(self.users.length){
+        for(var i = 0;i<self.users.length;i++){
+           (function(user,index){ 
+            self.messageService.getUnseenCounts(user.email).subscribe(
+            (data) => {
+              // console.log('here user is : ' , user);
+              // console.log('data count is : ' , data.obj.count);
+              user.ping = data.obj.count;
+            });
+           })(self.users[i],i);
+          // break;
+        }
+      }
+    }
     getUsers(){
       var self = this;
       this.authService.getAllUsers()
@@ -119,6 +145,7 @@ export class ChatListComponent implements OnInit {
           (data) => {
             self.zone.run(function(){
               self.users = data.obj;
+              self.getUnseenCounts();
               for(var i = 0;i<self.users.length;i++){
                 self.users[i].ping = 0;
               }
@@ -128,6 +155,7 @@ export class ChatListComponent implements OnInit {
     }
     selectUser(user:ChatUser){
       user.ping=0;
+      socket.emit('messagesSeen',{sender:user.email,receiver:this.localUser.email});
       this.userToChat = undefined;
       this.userToChat = user;
     }

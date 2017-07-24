@@ -1,5 +1,5 @@
 <div class="row">
-	<div class="col-md-10 chatbox" *ngIf="user">
+	<div class="col-md-10 chatbox" *ngIf="user" (click)="messageBoxActive()">
 	
 		<div class="chatbox-header row">
 			<div class="floatL">Chat with - {{user.firstName+ ' ' +user.lastName}}</div>

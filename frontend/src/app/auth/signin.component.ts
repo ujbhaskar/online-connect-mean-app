@@ -15,10 +15,12 @@ export class SigninComponent {
     constructor(private authService: AuthService, private router: Router) {}
 
     onSubmit() {
+        var self = this;
         const user = new User(this.myForm.value.email, this.myForm.value.password);
         this.authService.signin(user)
             .subscribe(
                 data => {
+                    self.myForm.reset();
                     localStorage.setItem('token', data.token);
                     this.router.navigateByUrl('/chat-list');
                     // this.authService.fetUser.emit(data.token);
@@ -33,7 +35,6 @@ export class SigninComponent {
                 },
                 error => console.error(error)
             );
-        this.myForm.reset();
     }
 
     ngOnInit() {

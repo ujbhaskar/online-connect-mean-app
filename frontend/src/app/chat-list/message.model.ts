@@ -4,6 +4,7 @@ export class Message {
     	public sender: string,
     	public receiver: [string],
     	public type: string,
-    	public date: Date
+    	public date: Date,
+    	public seen:Boolean
     	) {}
 }
