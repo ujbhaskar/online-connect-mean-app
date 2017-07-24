@@ -7,7 +7,8 @@ var schema = new Schema({
     sender: {type: String, required: true},
     receiver: [{type: String, required: true}],
     type: {type: String, required: true},
-    date: {type:Date, default: Date.now}
+    date: {type:Date, default: Date.now},
+    seen:{type:Boolean,default:false}
 });
 
 schema.plugin(mongooseUniqueValidator);

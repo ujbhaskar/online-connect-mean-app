@@ -18,6 +18,7 @@ module.exports = function(io){
             }
         })
         socket.on('inactive',function(us){
+            if(us){
             User.findOne({email:us.email}).exec(function(err,user){
                 if(err){
                     console.log(err);
@@ -30,8 +31,10 @@ module.exports = function(io){
                     setTimeout(function(){io.sockets.emit('awayUser')},100);   
                 })
             });
+            }
         });
         socket.on('userActive',function(us){
+            if(us){
             User.findOne({email:us.email}).exec(function(err,user){
                 if(err){
                     console.log(err);
@@ -44,6 +47,7 @@ module.exports = function(io){
                     setTimeout(function(){io.sockets.emit('loggedUser')},100);   
                 })
             });
+            }
         });
         socket.on('disconnect', function(){
             setTimeout(function(){

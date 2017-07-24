@@ -21,10 +21,7 @@ export class ChatBoxComponent implements OnInit {
 	messageForm: FormGroup;
 	messages:Message[];
 	curMessage:Message;
-  	constructor(private zone:NgZone,private authService: AuthService,private messageService: MessageService) {
-  		
-
-  	}
+  	constructor(private zone:NgZone,private authService: AuthService,private messageService: MessageService) {}
 	ngOnChanges(changes) {
 		this.getMessages();
 	}
@@ -53,7 +50,8 @@ export class ChatBoxComponent implements OnInit {
 			sender:this.authService.loggedUser.email,
 			receiver:[this.user.email],
 			type:'one-to-one',
-			date: new Date()
+			date: new Date(),
+			seen:false
 		}
 		this.messageService.saveMessage(this.curMessage).subscribe(
           (data) => {
@@ -62,7 +60,9 @@ export class ChatBoxComponent implements OnInit {
           }
 		);
 	}
-
+	messageBoxActive(){
+		socket.emit('messagesSeen',{sender: this.user.email,receiver:this.localUser.email});	
+	}
 	getMessages(){
 		var self = this;
 		if(!this.user)

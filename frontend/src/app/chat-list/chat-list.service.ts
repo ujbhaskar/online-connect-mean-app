@@ -24,12 +24,22 @@ export class MessageService {
     }
     getMessages(email:string){
         const headers = new Headers({'Content-Type': 'application/json'});
-        return this.http.get('http://'+this.configuration.getIpAddress()+':3000/message?token='+localStorage.getItem('token')+'&email='+email, {headers: headers})
+        return this.http.get('http://'+this.configuration.getIpAddress()+':3000/message?email='+email+'&token='+localStorage.getItem('token'), {headers: headers})
             .map((response: Response) => response.json())
             .catch((error: Response) => {
                 this.errorsService.handleError(error.json());
                 return Observable.throw(error.json());
             });
 
+    }
+
+    getUnseenCounts(email:any){
+        const headers = new Headers({'Content-Type': 'application/json'});
+        return this.http.get('http://'+this.configuration.getIpAddress()+':3000/message/unseenMessages?token='+localStorage.getItem('token')+'&email='+email, {headers: headers})
+            .map((response: Response) =>response.json())
+            .catch((error: Response) => {
+                this.errorsService.handleError(error.json());
+                return Observable.throw(error.json());
+            });
     }
 }

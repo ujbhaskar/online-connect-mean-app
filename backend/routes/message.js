@@ -7,6 +7,33 @@ var mongoose = require('mongoose');
 var Message = require('../models/message');
 
 module.exports = function(io){
+
+	var count = 0;
+    io.on('connection', function (socket) {
+    	socket.on('messagesSeen',function(obj){
+    		Message.find({sender:obj.sender,receiver:[obj.receiver],seen:false})
+    		.exec(function(err,messages){
+    			count = 0;
+    			for(var i = 0;i<messages.length;i++){
+    				(function(message,total){
+    					message.seen = true;
+    					message.save(function(err,result){
+    						if(err){
+    							console.log('err occured : ' , err);
+    						}
+    						else{
+    							count++;
+    							if(count === total){
+	                    			setTimeout(function(){io.sockets.emit('readMessage'+obj.receiver)},100);  
+	                    		}
+    						}
+    					})
+    				})(messages[i],messages.length);
+    			}
+    		});
+    	});
+    });
+
 	router.post('/', function(req, res, next) {
         var token = req.query.token;
         if(token){
@@ -54,7 +81,6 @@ module.exports = function(io){
 
 	router.get('/',function(req,res,next){
 		var token = req.query.token;
-		// console.log('req.query.email : ' , req.query.email);
 		if(token){
 			jwt.verify(req.query.token, 'secret', function (err, decoded) {
 				if(err){					           		
@@ -71,7 +97,6 @@ module.exports = function(io){
 	                    });
 					}
 					var messages1 = messages1;
-					// console.log('messages1 : ' , messages1);
 					Message.find({
 						sender: req.query.email,
 						receiver:{ $in : [decoded.user.email]}
@@ -83,7 +108,6 @@ module.exports = function(io){
 		                    });
 						}
 						var messages2 = messages2;
-					// console.log('messages2 : ' , messages2);
 						var messages = messages1.concat(messages2);
 						messages.sort(function(a, b) {
 						    return a.date.getTime() - b.date.getTime();
@@ -95,13 +119,6 @@ module.exports = function(io){
 					});
 
 				});
-				// console.log('{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{');
-				// console.log(decoded);
-				// console.log('}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}');
-				// return res.status(200).json({
-    //                     title: 'Success',
-    //                     obj: decoded
-    //                 });
 			});
 		}
         else{
@@ -110,6 +127,30 @@ module.exports = function(io){
                 error: {message: 'Need Authenticated Token!'}
             });
         }
+	});
+
+	router.get('/unseenMessages',function(req,res,next){
+		var token = req.query.token;
+		var sender = req.query.email;
+		if(token){
+			jwt.verify(req.query.token, 'secret', function (err, decoded) {
+				if(err){
+                    return res.status(401).json({
+                        title: 'Not Authenticated',
+                        error: {message: 'Invalid Token!'}
+                    });
+				}
+				else{
+					Message.find({sender:sender,receiver:[decoded.user.email],seen:false}).count(function(err, count){
+					    console.log("Number of docs: ", count );
+					    return res.status(200).json({
+	                        title: 'Got Count!!',
+	                        obj: {count: count}
+	                    });
+					});					
+				}
+			});
+		}
 	});
 	
 	return router;
