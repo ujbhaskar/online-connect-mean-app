@@ -7,7 +7,6 @@ import {Message} from "./message.model";
 import {socket} from "../auth/provideSocket";
 import {MessageService} from "./chat-list.service";
 
-
 @Component({
   selector: 'app-chat-box',
   templateUrl: './chat-box.component.html',

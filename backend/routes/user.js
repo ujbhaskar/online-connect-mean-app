@@ -23,13 +23,16 @@ module.exports = function(io){
                 if(err){
                     console.log(err);
                 }
-                user.isOnline = 'away';
-                user.save(function(err,result){
-                    if(err){
-                        console.log(err);
-                    }
-                    setTimeout(function(){io.sockets.emit('awayUser')},100);   
-                })
+                if(user){
+                    user.isOnline = 'away';
+                    user.save(function(err,result){
+                        if(err){
+                            console.log(err);
+                        }
+                        setTimeout(function(){io.sockets.emit('awayUser')},100);   
+                    })
+                       
+                }
             });
             }
         });
@@ -39,13 +42,15 @@ module.exports = function(io){
                 if(err){
                     console.log(err);
                 }
-                user.isOnline = 'yes';
-                user.save(function(err,result){
-                    if(err){
-                        console.log(err);
-                    }
-                    setTimeout(function(){io.sockets.emit('loggedUser')},100);   
-                })
+                if(user){
+                    user.isOnline = 'yes';
+                    user.save(function(err,result){
+                        if(err){
+                            console.log(err);
+                        }
+                        setTimeout(function(){io.sockets.emit('loggedUser')},100);   
+                    })   
+                }
             });
             }
         });

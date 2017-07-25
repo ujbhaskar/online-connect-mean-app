@@ -11,14 +11,14 @@
 		</div>
 		<div class="chatbox-body row">
 			<div class="row" *ngFor="let message of messages" [ngClass]="{'youTag': !(message.sender===localUser.email),'meTag': message.sender==localUser.email}">
-				<span class="chat-text">{{message.message}}</span>
+				<span class="chat-text" [innerHTML]="message.message | emoji"></span>
 			</div>
 		</div>
 		<div class="chatbox-footer row">
 			
 			<form [formGroup]="messageForm" (ngSubmit)="onSubmit()">
 				<div class="col-md-10 form-group">
-					<input class="form-control" formControlName="message"/>
+					<input class="form-control" formControlName="message" />
 					<!-- <input type="text" /> -->
 				</div>
 				<div class="col-md-2">

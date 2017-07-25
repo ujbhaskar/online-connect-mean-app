@@ -2,6 +2,7 @@ import { Component, OnInit,EventEmitter } from '@angular/core';
 import { Router } from "@angular/router";
 import { AuthService } from "./auth/auth.service";
 import {ChatUser} from "./auth/chat-user.model";
+import {EmojiPipe} from './chat-list/emoji.pipe';
 
 @Component({
   selector: 'app-root',
