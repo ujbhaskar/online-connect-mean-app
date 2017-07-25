@@ -14,6 +14,7 @@ export class SignupComponent implements OnInit {
     constructor(private authService: AuthService) {}
 
     onSubmit() {
+        var self = this;
         const user = new User(
             this.myForm.value.email,
             this.myForm.value.password,
@@ -23,11 +24,11 @@ export class SignupComponent implements OnInit {
         this.authService.signup(user)
             .subscribe(
                 data =>{ 
+                    self.myForm.reset();
                     alert('user created successfully');
                 },
                 error => console.error(error)
             );
-        this.myForm.reset();
     }
 
     ngOnInit() {

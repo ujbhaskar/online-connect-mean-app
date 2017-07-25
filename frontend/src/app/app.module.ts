@@ -17,6 +17,7 @@ import { ErrorsComponent } from './errors/errors.component';
 import { ErrorService } from "./errors/errors.service";
 import {Configurations} from "./configurations/configurations.service";
 import {MessageService} from "./chat-list/chat-list.service";
+import {EmojiPipe} from './chat-list/emoji.pipe';
 
 @NgModule({
   declarations: [
@@ -26,7 +27,8 @@ import {MessageService} from "./chat-list/chat-list.service";
     SignupComponent,
     ChatListComponent,
     ChatBoxComponent,
-    ErrorsComponent
+    ErrorsComponent,
+    EmojiPipe 
   ],
   imports: [
     CommonModule,

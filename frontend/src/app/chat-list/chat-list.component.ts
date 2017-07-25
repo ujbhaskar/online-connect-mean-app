@@ -86,11 +86,13 @@ export class ChatListComponent implements OnInit {
             }
             if(!self.isActive){ 
               for(var i = 0;i<self.users.length;i++){
-                if(self.users[i].email===email){                                   
-                  self.blinkTitle = setInterval(function(){
-                      var title = document.title;
-                      document.title = (title == self.users[i].firstName + ' messaged you' ? "Online Chat" : self.users[i].firstName + ' messaged you');
-                  }, 1000);
+                if(self.users[i].email===email){          
+                  if(!self.blinkTitle){
+                    self.blinkTitle = setInterval(function(){
+                        var title = document.title;
+                        document.title = (title == self.users[i].firstName + ' messaged you' ? "Online Chat" : self.users[i].firstName + ' messaged you');
+                    }, 1000);
+                  }
                   self.getUnseenCounts();
                   $('#chatAudio')[0].play();
                   break;
