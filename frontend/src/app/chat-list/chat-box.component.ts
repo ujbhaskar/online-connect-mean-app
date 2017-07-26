@@ -6,6 +6,8 @@ import {ChatUser} from "../auth/chat-user.model";
 import {Message} from "./message.model";
 import {socket} from "../auth/provideSocket";
 import {MessageService} from "./chat-list.service";
+import {EmojiPipe} from "./emoji.pipe";
+
 
 @Component({
   selector: 'app-chat-box',
@@ -20,28 +22,45 @@ export class ChatBoxComponent implements OnInit {
 	messageForm: FormGroup;
 	messages:Message[];
 	curMessage:Message;
-  	constructor(private zone:NgZone,private authService: AuthService,private messageService: MessageService) {}
+	showEmoList:Boolean = false;
+	emojiList:any;
+	sendingMessage:Boolean = false;
+  	constructor(private zone:NgZone,private authService: AuthService,private messageService: MessageService,private emojiPipe:EmojiPipe) {
+  		this.emojiList = this.emojiPipe.getEmoji();
+  	}
 	ngOnChanges(changes) {
 		this.getMessages();
 	}
   	ngOnInit() {
+        var self = this;
   		console.log('in ngOnInit :: ' , this.authService.loggedUser);
   		this.localUser = this.authService.loggedUser;
       	this.messageForm = new FormGroup({
             message: new FormControl(null,Validators.required)
         });
         this.getMessages();
-        var self = this;
         socket.on('messageSaved'+this.me.email+'->'+this.user.email, function(){
 			self.getMessages();
 		});
 		socket.on('messageSaved'+this.user.email+'->'+this.me.email, function(){
 			self.getMessages();
 		});
+	    socket.on('readMessage'+this.user.email,function(){
+	    	self.getMessages();
+	    })
+
   	}
 	closeChat(){
 		// this.user = undefined;
 		this.authService.closedUser.emit(this.user);
+	}
+	selectedEmo(emo){
+		var self = this;
+		this.zone.run(function(){
+			self.messageForm.value.message = emo + ' ';
+		});
+		this.onSubmit();
+		this.showEmoList = false;
 	}
 	onSubmit(){
 		this.curMessage = {
@@ -49,13 +68,15 @@ export class ChatBoxComponent implements OnInit {
 			sender:this.authService.loggedUser.email,
 			receiver:[this.user.email],
 			type:'one-to-one',
-			date: new Date(),
+			date: new Date().toUTCString(),
 			seen:false
 		}
+		this.sendingMessage = true
 		this.messageService.saveMessage(this.curMessage).subscribe(
           (data) => {
 			this.messageForm.reset();
 			this.getMessages();
+			this.sendingMessage = false;
           }
 		);
 	}

@@ -9,20 +9,38 @@
 				</button>
 			</div>
 		</div>
-		<div class="chatbox-body row">
+		<div class="chatbox-body row"  (click)="showEmoList = false">
 			<div class="row" *ngFor="let message of messages" [ngClass]="{'youTag': !(message.sender===localUser.email),'meTag': message.sender==localUser.email}">
 				<span class="chat-text" [innerHTML]="message.message | emoji"></span>
+				<br/>
+				<span>
+					<small class="grey" [innerHTML]="message.date | localdate"></small>
+					<small *ngIf="message.sender===localUser.email" [ngClass]="{'green':message.seen, 'grey':!message.seen}" class="glyphicon glyphicon-ok"></small>
+				</span>
 			</div>
 		</div>
 		<div class="chatbox-footer row">
 			
 			<form [formGroup]="messageForm" (ngSubmit)="onSubmit()">
-				<div class="col-md-10 form-group">
-					<input class="form-control" formControlName="message" />
+				<div class="col-md-12 form-group row">
+					<div class="smileyIconHolder">
+						<div *ngIf="showEmoList" class="icons-platform">
+							<span class="emotions" *ngFor="let emo of emojiList" [innerHTML]="emo.to | emoji"  (click)="selectedEmo(emo.to)"></span>
+						</div>
+						<div class="dummy-icon" (click)="showEmoList = !showEmoList">
+							<img src="/assets/emoji/dummySmiley.png" />
+						</div>
+					</div>
+					<div class="messageHolder">
+						<input placeholder="Write something here . . ." class="form-control" formControlName="message" (click)="showEmoList = false"/>
+					</div>
 					<!-- <input type="text" /> -->
-				</div>
-				<div class="col-md-2">
-					<button class="btn btn-primary" type="submit">Send</button>
+					<div class="btnHolder">
+						<button class="btn btn-primary" type="submit">
+							<span>Send</span>
+							<span *ngIf="sendingMessage" class="spinner spin-v-small"></span>
+						</button>
+					</div>
 				</div>
 			</form>
 		</div>

@@ -18,6 +18,7 @@ import { ErrorService } from "./errors/errors.service";
 import {Configurations} from "./configurations/configurations.service";
 import {MessageService} from "./chat-list/chat-list.service";
 import {EmojiPipe} from './chat-list/emoji.pipe';
+import {LocalDatePipe} from './chat-list/date.pipe';
 
 @NgModule({
   declarations: [
@@ -28,7 +29,8 @@ import {EmojiPipe} from './chat-list/emoji.pipe';
     ChatListComponent,
     ChatBoxComponent,
     ErrorsComponent,
-    EmojiPipe 
+    EmojiPipe,
+    LocalDatePipe 
   ],
   imports: [
     CommonModule,
@@ -38,7 +40,7 @@ import {EmojiPipe} from './chat-list/emoji.pipe';
     routing,
     HttpModule
   ],
-  providers: [AuthService, ErrorService,Configurations,MessageService],
+  providers: [AuthService, ErrorService,Configurations,MessageService,EmojiPipe],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
