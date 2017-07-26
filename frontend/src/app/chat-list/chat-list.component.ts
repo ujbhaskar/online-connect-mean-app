@@ -34,15 +34,18 @@ export class ChatListComponent implements OnInit {
   	ngOnInit() {
       var self = this;
       window.onfocus = function () {
-        console.log('in onfocus');
         socket.emit('userActive',self.localUser);
         self.isActive = true; 
         clearInterval(self.blinkTitle);
         self.blinkTitle = undefined;
-        console.log('now self.blinkTitle : ' , self.blinkTitle);
         $(document).prop('title','Online Chat');
+
+        if(self.userToChat && self.isActive){
+          socket.emit('messagesSeen',{sender: self.userToChat.email,receiver:self.localUser.email});
+        }
       }; 
       window.onblur = function () { 
+        console.log('in onblur');
         self.isActive = false;
         socket.emit('inactive',self.localUser);
       };
@@ -73,11 +76,16 @@ export class ChatListComponent implements OnInit {
         });
 
           socket.on('hello:'+this.localUser.email, function(email){
+            if(self.userToChat && self.userToChat.email === email && self.isActive){
+              console.log('in hello : ' , email);
+              socket.emit('messagesSeen',{sender: email,receiver:self.localUser.email});
+            }
             if(!self.userToChat || (email !== self.userToChat.email)){
               for(var i = 0;i<self.users.length;i++){
                 if(self.users[i].email===email){
                   self.zone.run(function(){
                     self.getUnseenCounts();
+                    console.log('leak 1');
                     $('#chatAudio')[0].play();
                   });
                   break;
@@ -94,6 +102,7 @@ export class ChatListComponent implements OnInit {
                     }, 1000);
                   }
                   self.getUnseenCounts();
+                    console.log('leak 2');
                   $('#chatAudio')[0].play();
                   break;
                 }

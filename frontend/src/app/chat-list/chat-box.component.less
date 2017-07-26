@@ -56,3 +56,54 @@
 		}
 	}
 }
+.glyphicon{
+	font-size: 9px;
+	left: 3px;
+}
+.smileyIconHolder{
+	positon:relative;
+	width:~'30px';
+	float:left;
+	.dummy-icon{
+		height: 27px;
+	    margin: 2px 1px;
+	    width: 27px;
+		img{
+			width:100%;
+			cursor: pointer;
+		}
+	}
+	.icons-platform{
+		position: absolute;
+		background: white;
+		border: 1px solid grey;
+		z-index: 100;
+		width: 100%;
+		bottom: 100%;
+		padding: 5px;
+		border-radius: 5px;
+		.emotions{
+			cursor:pointer;
+			margin:3px;
+		}
+	}
+}
+.messageHolder{
+	width:~'calc(100% - 100px)';
+	float:left;
+}
+.btnHolder{
+	float:left;
+	width:70px;
+	button{
+		padding: 6px;
+	}
+}
+.sending-circle{
+	width:20px;
+	height:20px;
+	border-style:solid;
+	border-color: white transparent white white;
+	border-width: 2px;
+	border-radius:10px;
+}
