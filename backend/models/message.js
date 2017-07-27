@@ -7,7 +7,7 @@ var schema = new Schema({
     sender: {type: String, required: true},
     receiver: [{type: String, required: true}],
     type: {type: String, required: true},
-    date: {type:Date, default: Date.now},
+    date: {type:String, default: new Date().toISOString()},
     seen:{type:Boolean,default:false}
 });
 

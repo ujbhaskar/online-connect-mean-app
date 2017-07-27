@@ -32,7 +32,8 @@
 						</div>
 					</div>
 					<div class="messageHolder">
-						<input placeholder="Write something here . . ." class="form-control" formControlName="message" (click)="showEmoList = false"/>
+						<div class="contee" id="uj" contenteditable (keyup)="checkme($event)" (click)="showEmoList = false" [innerHTML]="firstName | emoji"></div>
+						<!-- <input placeholder="Write something here . . ." class="form-control" formControlName="message" (click)="showEmoList = false"/> -->
 					</div>
 					<!-- <input type="text" /> -->
 					<div class="btnHolder">

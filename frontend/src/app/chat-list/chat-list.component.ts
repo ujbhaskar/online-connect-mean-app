@@ -44,8 +44,7 @@ export class ChatListComponent implements OnInit {
           socket.emit('messagesSeen',{sender: self.userToChat.email,receiver:self.localUser.email});
         }
       }; 
-      window.onblur = function () { 
-        console.log('in onblur');
+      window.onblur = function () {
         self.isActive = false;
         socket.emit('inactive',self.localUser);
       };
