@@ -24,7 +24,10 @@ module.exports = function(io){
     						else{
     							count++;
     							if(count === total){
-	                    			setTimeout(function(){io.sockets.emit('readMessage'+obj.receiver)},100);  
+	                    			setTimeout(function(){
+	                    				io.sockets.emit('messageSeen'+obj.sender+'->'+obj.receiver);
+	                    				io.sockets.emit('readMessage'+obj.receiver);
+	                    			},100);  
 	                    		}
     						}
     					})
@@ -110,7 +113,7 @@ module.exports = function(io){
 						var messages2 = messages2;
 						var messages = messages1.concat(messages2);
 						messages.sort(function(a, b) {
-						    return a.date.getTime() - b.date.getTime();
+						    return new Date(a.date).getTime() - new Date(b.date).getTime();
 						});
 						return res.status(200).json({
 	                        title: 'Success',

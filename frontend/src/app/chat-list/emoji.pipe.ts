@@ -153,20 +153,31 @@ export class  EmojiPipe implements PipeTransform {
 
 		];
 	}
+	addhttp(url) {
+	   if (/^(f|ht)tps?:\/\//i.test(url)) {
+	      url = '<a target="_blank" href="'+url+'" >'+url+'</a>';
+	   }
+	   return url;
+	}
 	transform(value: string): string {
 		var text = value;
-		var ar = text.split(' ');
-		var emotionSymbols = this.getEmoji();
+		if(text){
 
-		for(var i = 0;i<ar.length;i++){
-			for(var j = 0; j<emotionSymbols.length;j++){
-				if(ar[i] === emotionSymbols[j].to){
-					ar[i] = '<span><img src="assets/emoji/'+emotionSymbols[j].with+'" class="emogi-image"></span>';
-					break;
+			var ar = text.split(' ');
+			var emotionSymbols = this.getEmoji();
+
+			for(var i = 0;i<ar.length;i++){
+				for(var j = 0; j<emotionSymbols.length;j++){
+					if(ar[i] === emotionSymbols[j].to){
+						ar[i] = '<span><img src="assets/emoji/'+emotionSymbols[j].with+'" class="emogi-image"></span>';
+					}
+					else{
+						ar[i] = this.addhttp(ar[i]);
+					}
 				}
 			}
+		    return ar.join(' ');	
 		}
-	    return ar.join(' ');
 	}
 
 }

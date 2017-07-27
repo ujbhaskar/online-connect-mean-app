@@ -61,7 +61,8 @@ export class AuthService  implements OnInit {
         return this.http.post('http://'+this.configuration.getIpAddress()+':3000/user/signin', body, {headers: headers})
             .map((response: Response) => response.json())
             .catch((error: Response) => {
-                this.errorsService.handleError(error.json());
+                console.log(error);
+                // this.errorsService.handleError(error.json());
                 return Observable.throw(error.json());
             });
     }

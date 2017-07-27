@@ -54,17 +54,32 @@ export class ChatBoxComponent implements OnInit {
 		// this.user = undefined;
 		this.authService.closedUser.emit(this.user);
 	}
+	checkme(e){
+		if(e.keyCode === 13){
+
+			this.onSubmit();
+		}
+
+	}
 	selectedEmo(emo){
-		var self = this;
-		this.zone.run(function(){
-			self.messageForm.value.message = emo + ' ';
-		});
-		this.onSubmit();
-		this.showEmoList = false;
+		$('#uj').html(($('#uj').html().split('<br>')).join(''));
+		for(var i = 0;i<this.emojiList.length;i++){
+			if(this.emojiList[i].to === emo){
+				$('#uj').append('<img class="emogi-image" src="/assets/emoji/'+this.emojiList[i].with+'" />');
+				break;
+			}
+		}
 	}
 	onSubmit(){
+		$('#uj').html($('#uj').html().split('<div><br></div>').join('').split('<div>').join('').split('<br>').join('').split('</div>').join(''));
+		console.log('in onsubmit');
+		if($('#uj').html() === ''){
+			$('#uj').html('');
+			return;
+		}
+		this.showEmoList = false;
 		this.curMessage = {
-			message: this.messageForm.value.message,
+			message: $('#uj').html(),
 			sender:this.authService.loggedUser.email,
 			receiver:[this.user.email],
 			type:'one-to-one',
@@ -74,7 +89,7 @@ export class ChatBoxComponent implements OnInit {
 		this.sendingMessage = true
 		this.messageService.saveMessage(this.curMessage).subscribe(
           (data) => {
-			this.messageForm.reset();
+          	$('#uj').html('');
 			this.getMessages();
 			this.sendingMessage = false;
           }
