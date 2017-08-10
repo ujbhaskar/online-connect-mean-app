@@ -27,7 +27,7 @@ export class AuthService  implements OnInit {
         return this.http.post('http://'+this.configuration.getIpAddress()+':3000/user', body, {headers: headers})
             .map((response: Response) => response.json())
             .catch((error: Response) => {
-                this.errorsService.handleError(error.json());
+                // this.errorsService.handleError(error.json());
                 return Observable.throw(error.json());
             });
     }
@@ -62,7 +62,8 @@ export class AuthService  implements OnInit {
             .map((response: Response) => response.json())
             .catch((error: Response) => {
                 console.log(error);
-                // this.errorsService.handleError(error.json());
+                // alert('Invalid login credentials');
+                this.errorsService.handleError(error.json());
                 return Observable.throw(error.json());
             });
     }

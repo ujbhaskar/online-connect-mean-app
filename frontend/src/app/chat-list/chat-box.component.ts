@@ -6,6 +6,7 @@ import {ChatUser} from "../auth/chat-user.model";
 import {Message} from "./message.model";
 import {socket} from "../auth/provideSocket";
 import {MessageService} from "./chat-list.service";
+import {Configurations} from "../configurations/configurations.service";
 import {EmojiPipe} from "./emoji.pipe";
 
 
@@ -25,7 +26,7 @@ export class ChatBoxComponent implements OnInit {
 	showEmoList:Boolean = false;
 	emojiList:any;
 	sendingMessage:Boolean = false;
-  	constructor(private zone:NgZone,private authService: AuthService,private messageService: MessageService,private emojiPipe:EmojiPipe) {
+  	constructor(private zone:NgZone,private authService: AuthService,private messageService: MessageService,private emojiPipe:EmojiPipe,private configuration: Configurations) {
   		this.emojiList = this.emojiPipe.getEmoji();
   	}
 	ngOnChanges(changes) {
@@ -56,7 +57,6 @@ export class ChatBoxComponent implements OnInit {
 	}
 	checkme(e){
 		if(e.keyCode === 13){
-
 			this.onSubmit();
 		}
 
@@ -70,16 +70,36 @@ export class ChatBoxComponent implements OnInit {
 			}
 		}
 	}
+	placeCaretAtEnd(el) {
+	    el.focus();
+	    if (typeof window.getSelection != "undefined"
+	            && typeof document.createRange != "undefined") {
+	        var range = document.createRange();
+	        range.selectNodeContents(el);
+	        range.collapse(false);
+	        var sel = window.getSelection();
+	        sel.removeAllRanges();
+	        sel.addRange(range);
+	    }
+	}
+	clickTesty(){
+		this.messageService.testy().subscribe(
+          (data) => {
+          	console.log('in clickTesty where data is : ' , data);
+          }
+		);
+	}
 	onSubmit(){
 		$('#uj').html($('#uj').html().split('<div><br></div>').join('').split('<div>').join('').split('<br>').join('').split('</div>').join(''));
-		console.log('in onsubmit');
 		if($('#uj').html() === ''){
 			$('#uj').html('');
 			return;
 		}
+		$('#uj').focus();
+		this.placeCaretAtEnd( document.getElementById("uj") );
 		this.showEmoList = false;
 		this.curMessage = {
-			message: $('#uj').html(),
+			message: this.configuration.encrypt($('#uj').html()),
 			sender:this.authService.loggedUser.email,
 			receiver:[this.user.email],
 			type:'one-to-one',
@@ -105,7 +125,10 @@ export class ChatBoxComponent implements OnInit {
 		this.messageService.getMessages(this.user.email).subscribe(
 			(data)=>{
 				self.zone.run(function(){
-					self.messages = data.obj;
+					self.messages = data.obj.map(function(item){
+						item.message = self.configuration.decrypt(item.message);
+						return item;
+					});
 					setTimeout(function(){
 						$("div.chatbox-body").scrollTop($('div.chatbox-body').prop('scrollHeight'));
 					},100);
