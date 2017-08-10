@@ -2,6 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { FormGroup, FormControl, Validators } from "@angular/forms";
 
 import { AuthService } from "./auth.service";
+import { ErrorService } from "../errors/errors.service";
 import { User } from "./user.model";
 
 @Component({
@@ -11,7 +12,7 @@ import { User } from "./user.model";
 export class SignupComponent implements OnInit {
     myForm: FormGroup;
 
-    constructor(private authService: AuthService) {}
+    constructor(private authService: AuthService,private errorsService: ErrorService) {}
 
     onSubmit() {
         var self = this;
@@ -23,9 +24,14 @@ export class SignupComponent implements OnInit {
         );
         this.authService.signup(user)
             .subscribe(
-                data =>{ 
+                data =>{
                     self.myForm.reset();
-                    alert('user created successfully');
+                    this.errorsService.handleError({
+                        title: 'Success',
+                        error:{
+                            message : 'User Created successfully'
+                        }
+                    });
                 },
                 error => console.error(error)
             );
