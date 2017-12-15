@@ -9,7 +9,7 @@ export class  LocalDatePipe implements PipeTransform {
 		return month[num];
 	}
 	getFullDate(dateStr){
-		return  new Date(dateStr).getDate() + ' ' + this.getMonthName(new Date(dateStr).getMonth()+1) + ' ' + new Date(dateStr).getFullYear() + ' ' + this.getTimeFormat(new Date(dateStr));
+		return  new Date(dateStr).getDate() + ' ' + this.getMonthName(new Date(dateStr).getMonth()) + ' ' + new Date(dateStr).getFullYear() + ' ' + this.getTimeFormat(new Date(dateStr));
 	}
 	getTimeFormat(date){
 		var HH = date.getHours();

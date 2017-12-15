@@ -82,13 +82,13 @@ export class ChatBoxComponent implements OnInit {
 	        sel.addRange(range);
 	    }
 	}
-	clickTesty(){
+	/*clickTesty(){
 		this.messageService.testy().subscribe(
           (data) => {
           	console.log('in clickTesty where data is : ' , data);
           }
 		);
-	}
+}*/
 	onSubmit(){
 		$('#uj').html($('#uj').html().split('<div><br></div>').join('').split('<div>').join('').split('<br>').join('').split('</div>').join(''));
 		if($('#uj').html() === ''){
@@ -99,7 +99,7 @@ export class ChatBoxComponent implements OnInit {
 		this.placeCaretAtEnd( document.getElementById("uj") );
 		this.showEmoList = false;
 		this.curMessage = {
-			message: this.configuration.encrypt($('#uj').html()),
+			message: $('#uj').html(),
 			sender:this.authService.loggedUser.email,
 			receiver:[this.user.email],
 			type:'one-to-one',
@@ -126,7 +126,7 @@ export class ChatBoxComponent implements OnInit {
 			(data)=>{
 				self.zone.run(function(){
 					self.messages = data.obj.map(function(item){
-						item.message = self.configuration.decrypt(item.message);
+						item.message = item.message;
 						return item;
 					});
 					setTimeout(function(){

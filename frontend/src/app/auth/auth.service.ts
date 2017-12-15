@@ -15,7 +15,8 @@ export class AuthService  implements OnInit {
     closedUser = new EventEmitter<ChatUser>();
     ngOnInit(){
     }
-    constructor(private http: Http, private router: Router,private errorsService: ErrorService,private configuration: Configurations) {}
+    constructor(private http: Http, private router: Router,private errorsService: ErrorService,
+    private configuration: Configurations) {}
 
     // editMessage(userId: string) {
     //     this.gotUserId.emit(userId);
